@@ -1,0 +1,82 @@
+import numpy as np
+import pandas as pd
+import seaborn as sb
+import matplotlib.pyplot as plt
+import sklearn
+from pandas import Series, DataFrame
+from pylab import rcParams
+from sklearn import preprocessing
+from sklearn.linear_model import LogisticRegression
+from sklearn.cross_validation import train_test_split
+from sklearn import metrics 
+from sklearn.metrics import classification_report
+
+%matplotlib inline
+rcParams['figure.figsize'] = 10, 8
+sb.set_style('whitegrid')
+
+#Read and segregate which data are require for analysis
+
+data = pd.read_csv('NewHarish_05_Feb.csv')
+data1 = data.loc[data['datalabel'] == 'BallData']
+
+data1.info()
+
+#Get dummy values for object / string values
+
+ball_color = pd.get_dummies(data1['ball_color'],drop_first=True)
+ball_color.head()
+
+#Drop unwanted columns
+
+data1.drop(['ball_color', 'playerid','ballhittype','datalabel','ball_id'],axis=1,inplace=True)
+data1.head()
+
+data_dmy = pd.concat([data1,ball_color, playerid,ballhittype,datalabel,ball_id],axis=1)
+data_dmy.head()
+
+data_dmy.drop(['ballpointzone','destroytimestampglobal_time'],axis=1,inplace=True)
+data_dmy.head(100)
+
+data_dmy.info()
+
+#Split data 
+
+X = data_dmy.ix[:,(1,2,3,4,5,6)].values
+y = data_dmy.ix[:,0].values
+
+#Train X and y
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .3, random_state=25)
+
+LogReg = LogisticRegression()
+LogReg.fit(X_train, y_train)
+
+o/p - LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+          intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
+          penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
+          verbose=0, warm_start=False)
+
+y_pred = LogReg.predict(X_test)
+
+
+from sklearn.metrics import confusion_matrix
+confusion_matrix = confusion_matrix(y_test, y_pred)
+confusion_matrix
+
+o/p- array([[ 0, 19, 34,  0],
+       [ 0, 24, 45,  0],
+       [ 0, 14, 84,  5],
+       [ 0, 13, 18, 15]], dtype=int64)
+
+
+print(classification_report(y_test, y_pred))
+
+o/p -   precision    recall  f1-score   support
+
+        1.0       0.00      0.00      0.00        53
+        2.0       0.34      0.35      0.35        69
+        3.0       0.46      0.82      0.59       103
+        4.0       0.75      0.33      0.45        46
+
+avg / total       0.39      0.45      0.39       271

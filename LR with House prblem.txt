@@ -1,0 +1,89 @@
+import pandas as pd
+# read CSV file directly from a URL and save the results
+data = pd.read_csv('train.csv', index_col=0)
+
+
+# create a Python list of feature names
+feature_cols = ['MSSubClass','LotArea']
+
+# use the list to select a subset of the original DataFrame
+X_train = data[feature_cols]
+
+# equivalent command to do this in one line
+X_train = data[['MSSubClass','LotArea']]
+
+# print the first 5 rows
+X_train.head()
+
+
+ 	MSSubClass 	LotArea
+Id 		
+1 	60 	8450
+2 	20 	9600
+3 	60 	11250
+4 	70 	9550
+5 	60 	14260
+
+
+Y_train = data['SalePrice']
+Y_train = data.SalePrice
+Y_train.head()
+
+Id
+1    208500
+2    181500
+3    223500
+4    140000
+5    250000
+Name: SalePrice, dtype: int64
+
+
+# import model
+from sklearn.linear_model import LinearRegression
+
+# instantiate
+linreg = LinearRegression()
+
+# fit the model to the training data (learn the coefficients)
+linreg.fit(X_train, Y_train)
+
+o/p LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
+
+house_train = pd.read_csv("train.csv")
+house_train = pd.get_dummies(house_train, columns=['LotArea', 'OverallQual'])
+
+house_train.drop(['Id','MSSubClass'], axis=1, inplace=True)
+
+X_train = house_train
+Y_train = house_train['SalePrice']
+
+data = pd.read_csv('test.csv', index_col=0)
+
+# create a Python list of feature names
+feature_cols = ['MSSubClass','LotArea']
+
+# use the list to select a subset of the original DataFrame
+X_test = data[feature_cols]
+
+# equivalent command to do this in one line
+#X = data[['MSSubClass','LotArea']]
+
+# print the first 5 rows
+X_test.head()
+
+ 	MSSubClass 	LotArea
+Id 		
+1461 	20 	11622
+1462 	20 	14267
+1463 	60 	13830
+1464 	60 	9978
+1465 	120 	5005
+
+
+# make predictions on the testing set
+Y_pred = linreg.predict(X_test)
+
+Y_pred
+
+o/p - array([ 186532.87965378,  191945.03185069,  187418.8184106 , ...,
+        203675.79500566,  178214.28672072,  178818.71418239])
